@@ -192,9 +192,11 @@ uint32_t ECSensor::readSensor() {
 
   uint32_t averageCycles;
   if (timeout) {
+    sensorStatus = EC_FAIL;
     averageCycles = 0;
   }
   else {
+    sensorStatus = EC_SUCCESS;
     averageCycles = (totalCycles >> oversamplingRate);
   }
   EIMSK &= ~(1 << INT0);                      // Disable INT0.
@@ -313,9 +315,11 @@ uint32_t ECSensor::readSensor() {
     delayMicroseconds(DISCHARGEDELAY);
   }
   if (timeout) {
+    sensorStatus = EC_FAIL;
     dischargeCycles = 0;
   }
   else {
+    sensorStatus = EC_SUCCESS;
     dischargeCycles = (totalCycles >> oversamplingRate);
   }   
   yield();                                    // For the ESP8266: allow for background processes to run.
@@ -360,6 +364,7 @@ void ECSensor::begin() {
 uint32_t ECSensor::readSensor() {
   uint32_t totalCycles = 0;
   bool timeout = false;
+  sensorStatus = EC_SUCCESS;
   for (uint8_t i = 0; i < (1 << oversamplingRate); i++) {
 
     ///////////////////////////////////////////////////////////////////////
@@ -399,6 +404,7 @@ uint32_t ECSensor::readSensor() {
     totalCycles += dischargeCycles;
     PCMSK &= ~(1 << INTERRUPT);               // Clear the pin change interrupt on CAPPOS.
     if (timeout) {                            // A timeout here means the sensor is not measuring anything.
+      sensorStatus = EC_FAIL;
       break;
     }
 
@@ -697,9 +703,11 @@ uint32_t ECSensor::readSensor() {
   EIMSK &= ~(1 << INT4);                      // Disable INT4
   uint32_t averageCycles;
   if (timeout) {
+    sensorStatus = EC_FAIL;
     averageCycles = 0;
   }
   else {
+    sensorStatus = EC_SUCCESS;
     averageCycles = (totalCycles >> oversamplingRate);
   }
   return averageCycles;
