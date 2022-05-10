@@ -60,7 +60,7 @@ class ECSensor {
 #if defined(__AVR__)
     void begin(void);
 #elif defined(ESP8266)
-    void begin(uint8_t, uint8_t, uint8_t);
+    void begin(uint8_t cp, uint8_t cn, uint8_t ec);
 #endif
     
     uint32_t readSensor(void);
